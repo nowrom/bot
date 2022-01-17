@@ -7,8 +7,8 @@ use telexide_fork::{
 };
 use tokio::time::sleep;
 
-#[command(description = "just a ping-pong command")]
-async fn ping(context: Context, message: Message) -> CommandResult {
+#[command(description = "Find a rom for your needs")]
+async fn rom(context: Context, message: Message) -> CommandResult {
     context
         .api
         .send_message(SendMessage::new(message.chat.get_id(), "pong"))
@@ -22,11 +22,12 @@ pub async fn start_telegram() -> Result<()> {
 
     let client = ClientBuilder::new()
         .set_token(&token)
-        .set_framework(create_framework!(&bot_name, ping))
-        // .set_allowed_updates(vec![UpdateType::CallbackQuery, UpdateType::Message])
+        .set_framework(create_framework!(&bot_name, rom))
+        .set_allowed_updates(vec![UpdateType::CallbackQuery, UpdateType::Message])
         .build();
 
     loop {
+        log::info!("Starting start loop of bot...");
         let ret = client.start().await;
         match ret {
             Err(err) => {

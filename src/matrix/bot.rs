@@ -4,7 +4,7 @@ use anyhow::Result;
 use matrix_sdk::{ruma::events, Client, ClientConfig, SyncSettings};
 use reqwest::Url;
 
-pub async fn start_matrix() {
+pub async fn start_matrix() -> Result<()> {
     let client_config = ClientConfig::new().store_path("./store");
 
     let homeserver_url =
@@ -30,4 +30,5 @@ pub async fn start_matrix() {
 
     let settings = SyncSettings::default().token(client.sync_token().await.unwrap());
     client.sync(settings).await;
+    Ok(())
 }
