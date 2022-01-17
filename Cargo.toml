@@ -12,6 +12,7 @@ base64 = "0.13.0"
 byte-unit = "4.0.13"
 cached = "0.26.2"
 dotenv = "0.15.0"
+fuse-rust = "0.3.0"
 futures = "0.3.19"
 http = "0.2.6"
 humantime = "2.1.0"
@@ -24,7 +25,8 @@ rand = "0.8.4"
 reqwest = { version = "0.11.9", features = ["json", "gzip", "brotli"] }
 serde = { version = "1.0.133", features = ["derive"] }
 serde_json = "1.0.74"
-telexide-fork = "0.2.1"
+# telexide-fork = "0.2.1"
+teloxide = { version = "0.5.3", features = ["macros", "auto-send"] }
 tokio = { version = "1.15.0", features = ["full"] }
 tokio-pg-mapper = "0.2.0"
 tokio-pg-mapper-derive = "0.2.0"
