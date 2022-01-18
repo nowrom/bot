@@ -5,7 +5,7 @@ use super::prelude::*;
 
 pub async fn builtin_exec(client: &Client, cmd: &ApplicationCommand) -> Result<()> {
     let value = match cmd.data.name.as_str() {
-        "user" => rom::execute(client, cmd).await,
+        "rom" => rom::execute(client, cmd).await,
         _ => return Ok(()),
     };
 

@@ -16,6 +16,8 @@ use twilight_model::id::GuildId;
 use crate::discord::commands;
 use crate::discord::prelude::*;
 
+use super::commands::rom;
+
 pub async fn start_discord() -> Result<()> {
     dotenv::dotenv().ok();
 
@@ -35,6 +37,14 @@ pub async fn start_discord() -> Result<()> {
             .parse::<core::num::NonZeroU64>()
             .unwrap(),
     ));
+
+    http.set_guild_commands(
+        GuildId(core::num::NonZeroU64::new(748956745409232945).unwrap()),
+        &[rom::command()],
+    )
+    .unwrap()
+    .exec()
+    .await?;
 
     while let Some((_shard_id, event)) = events.next().await {
         match event {
