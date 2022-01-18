@@ -36,9 +36,9 @@ async fn on_room_message(event: SyncMessageEvent<MessageEventContent>, room: Roo
             //Skip the next iter
             iter.next();
             let phone = iter.collect::<Vec<&str>>().join(" ");
-            let text = if let Some(device) = codename(phone.clone()) {
+            let text = if let Some(device) = codename(phone.clone()).await {
                 format_device(device, vec![])
-            } else if let Some((device, alternatives)) = search(phone) {
+            } else if let Some((device, alternatives)) = search(phone).await {
                 format_device(device, alternatives)
             } else {
                 "Phone not found".to_owned()
@@ -103,10 +103,6 @@ pub async fn start_matrix() -> Result<()> {
         .await
         .unwrap();
 
-    // log::info!("Logged in as: {}",client.u);
-    log::info!("Logged in as: {}", "now rom");
-    log::info!("Logged in as: {}", "now rom");
-    log::info!("Logged in as: {}", "now rom");
     client.register_event_handler(on_room_message).await;
     client
         .register_event_handler(on_stripped_state_member)

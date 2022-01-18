@@ -32,6 +32,7 @@ twilight-http = "0.8.4"
 twilight-model = "0.8.4"
 twilight-util = { version = "0.8.2", features = ["builder"] }
 url = "2.2.2"
+urlencoding = "2.1.0"
 
 [features]
 nodiscord = []

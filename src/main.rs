@@ -2,14 +2,12 @@ use anyhow::Result;
 
 use rombot::{
     discord::bot::start_discord, matrix::bot::start_matrix, telegram::bot::start_telegram,
-    update_devices,
 };
 
 #[tokio::main]
 async fn main() -> Result<()> {
     tracing_subscriber::fmt().init();
     dotenv::dotenv()?;
-    update_devices().await;
 
     #[cfg(not(feature = "nodiscord"))]
     tokio::spawn(async {

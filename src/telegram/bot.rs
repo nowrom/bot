@@ -14,9 +14,9 @@ pub async fn start_telegram() {
             let mut iter = body.split(' ');
             iter.next();
             let phone = iter.collect::<Vec<&str>>().join(" ");
-            let text = if let Some(device) = codename(phone.clone()) {
+            let text = if let Some(device) = codename(phone.clone()).await {
                 format_device(device, vec![])
-            } else if let Some((device, alternatives)) = search(phone) {
+            } else if let Some((device, alternatives)) = search(phone).await {
                 format_device(device, alternatives)
             } else {
                 "Phone not found".to_owned()

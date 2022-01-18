@@ -2,11 +2,25 @@ pub mod discord;
 pub mod matrix;
 pub mod telegram;
 
-use std::{collections::HashSet, sync::Mutex};
+use std::collections::HashSet;
 
-use fuse_rust::{Fuse, FuseProperty, Fuseable};
 use lazy_static::lazy_static;
+use reqwest::Client;
 use serde::{Deserialize, Serialize};
+use urlencoding::encode;
+
+static APP_USER_AGENT: &str = concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION"),);
+
+lazy_static! {
+    pub static ref CLIENT: Client = {
+        Client::builder()
+            .brotli(true)
+            .gzip(true)
+            .user_agent(APP_USER_AGENT)
+            .build()
+            .unwrap()
+    };
+}
 
 #[derive(Deserialize, Serialize, Debug, Clone, Hash, PartialEq, Eq)]
 pub struct RomDevice {
@@ -49,83 +63,38 @@ impl Device {
     }
 }
 
-impl Fuseable for Device {
-    fn properties(&self) -> Vec<FuseProperty> {
-        return vec![
-            FuseProperty {
-                value: String::from("name"),
-                weight: 2.0,
-            },
-            FuseProperty {
-                value: String::from("codename"),
-                weight: 0.5,
-            },
-            FuseProperty {
-                value: String::from("brand"),
-                weight: 1.0,
-            },
-        ];
-    }
-
-    fn lookup(&self, key: &str) -> Option<&str> {
-        match key {
-            "name" => Some(&self.name),
-            "codename" => Some(&self.codename),
-            "brand" => Some(&self.brand),
-            _ => None,
-        }
-    }
+pub async fn req(url: String) -> Vec<Device> {
+    serde_json::from_str(&CLIENT.get(url).send().await.unwrap().text().await.unwrap()).unwrap()
 }
 
-impl Device {}
+pub async fn search(text: String) -> Option<(Device, Vec<Device>)> {
+    let results = req(format!(
+        "https://nowrom.deno.dev/device?q={}&limit=10",
+        encode(&text)
+    ))
+    .await;
 
-lazy_static! {
-    static ref DATA: Mutex<Vec<Device>> = Mutex::new(vec![]);
-}
-
-pub async fn update_devices() {
-    let text = reqwest::Client::new()
-        .get("https://nowrom.deno.dev")
-        .send()
-        .await
-        .unwrap()
-        .text()
-        .await
-        .unwrap();
-    let mut data: Vec<Device> = serde_json::from_str(&text).unwrap();
-    let mut devices = DATA.lock().unwrap();
-    devices.clear();
-    devices.append(&mut data);
-}
-
-pub fn get_data() -> Vec<Device> {
-    (DATA.lock().unwrap()).to_vec()
-}
-
-pub fn search(text: String) -> Option<(Device, Vec<Device>)> {
-    let data = get_data();
-
-    let fuse = Fuse::default();
-    let results = fuse.search_text_in_fuse_list(&text, &data);
-    return if results.is_empty() {
+    if results.is_empty() {
         None
     } else {
-        let val = data[results[0].index].clone();
-        let mut alternatives = vec![];
+        let mut iter = results.into_iter();
 
-        for r in results.iter().take(10).collect::<Vec<_>>() {
-            alternatives.push(data[r.index].clone());
-        }
-        Some((val, alternatives))
-    };
+        Some((iter.next().unwrap(), iter.collect::<Vec<_>>()))
+    }
 }
 
-pub fn codename(i: String) -> Option<Device> {
-    let data = get_data();
-    let mut iter = data.iter();
-    let search = i.to_lowercase();
-    let t = iter.find(|x| *x.codename().to_lowercase() == search);
-    t.cloned()
+pub async fn codename(i: String) -> Option<Device> {
+    let results = req(format!(
+        "https://nowrom.deno.dev/device?codename={}",
+        encode(&i)
+    ))
+    .await;
+
+    if results.is_empty() {
+        None
+    } else {
+        Some(results[0].clone())
+    }
 }
 
 pub fn format_device(d: Device, other: Vec<Device>) -> String {
