@@ -16,6 +16,7 @@ use crate::discord::prelude::*;
 
 use super::commands::rom;
 
+#[allow(clippy::single_match)]
 pub async fn start_discord() -> Result<()> {
     dotenv::dotenv().ok();
 

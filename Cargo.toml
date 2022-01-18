@@ -2,6 +2,8 @@
 name = "rombot"
 version = "0.1.0"
 edition = "2021"
+license = "GPL-3.0"
+authors = ["Tricked-dev <me@tricked.pro>"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -30,3 +32,8 @@ twilight-http = "0.8.4"
 twilight-model = "0.8.4"
 twilight-util = { version = "0.8.2", features = ["builder"] }
 url = "2.2.2"
+
+[features]
+nodiscord = []
+notelegram = []
+nomatrix = []

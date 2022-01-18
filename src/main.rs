@@ -11,13 +11,16 @@ async fn main() -> Result<()> {
     dotenv::dotenv()?;
     update_devices().await;
 
+    #[cfg(not(feature = "nodiscord"))]
     tokio::spawn(async {
         start_discord().await.unwrap();
     });
+    #[cfg(not(feature = "notelegram"))]
     tokio::spawn(async {
         start_telegram().await;
     });
-    start_matrix().await.unwrap();
+    #[cfg(not(feature = "nomatrix"))]
+    start_matrix().await?;
 
     Ok(())
 }
