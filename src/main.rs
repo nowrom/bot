@@ -1,20 +1,8 @@
 use anyhow::Result;
-use fuse_rust::{Fuse, FuseProperty, Fuseable};
-use futures::executor::block_on;
-use lazy_static::lazy_static;
+
 use rombot::{
-    discord::bot::start_discord,
-    matrix::bot::start_matrix,
-    search,
-    // telegram::bot::start_telegram,
+    discord::bot::start_discord, matrix::bot::start_matrix, telegram::bot::start_telegram,
     update_devices,
-};
-use serde::{Deserialize, Serialize};
-use serde_json::Value;
-use std::{rc::Rc, sync::Mutex};
-use tokio::{
-    task,
-    time::{sleep, Duration},
 };
 
 #[tokio::main]
@@ -26,19 +14,10 @@ async fn main() -> Result<()> {
     tokio::spawn(async {
         start_discord().await.unwrap();
     });
-
     tokio::spawn(async {
-        block_on(async {
-            start_matrix().await.unwrap();
-        });
+        start_telegram().await;
     });
-    // tokio::spawn(async {
-    //     block_on(async {
-    start_telegram().await.unwrap();
-    // });
-    // });
-    // loop {
-    //     sleep(Duration::from_secs(60 * 60 * 24 * 7)).await;
-    // }
+    start_matrix().await.unwrap();
+
     Ok(())
 }

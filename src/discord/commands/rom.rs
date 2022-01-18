@@ -1,15 +1,10 @@
 use std::slice::Iter;
 use twilight_http::Client;
-use twilight_model::{
-    application::{
-        callback::InteractionResponse,
-        command::{Command, CommandType},
-        interaction::{
-            application_command::{CommandDataOption, CommandOptionValue},
-            ApplicationCommand,
-        },
-    },
-    channel::message::AllowedMentions,
+use twilight_model::application::callback::InteractionResponse;
+use twilight_model::application::command::{Command, CommandType};
+use twilight_model::application::interaction::{
+    application_command::{CommandDataOption, CommandOptionValue},
+    ApplicationCommand,
 };
 use twilight_util::builder::{
     command::{CommandBuilder, StringBuilder},

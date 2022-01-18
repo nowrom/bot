@@ -11,7 +11,7 @@ pub async fn builtin_exec(client: &Client, cmd: &ApplicationCommand) -> Result<(
 
     match value {
         Ok(_) => {}
-        Err(err) => {}
+        Err(_err) => {}
     };
     Ok(())
 }

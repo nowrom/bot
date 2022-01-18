@@ -2,13 +2,13 @@ use std::env;
 use std::time::Duration;
 
 use anyhow::Result;
-use matrix_sdk::ruma::events;
+
 use matrix_sdk::ruma::events::room::member::MemberEventContent;
 use matrix_sdk::ruma::events::room::message::{
     MessageEventContent, MessageType, TextMessageEventContent,
 };
+use matrix_sdk::ruma::events::StrippedStateEvent;
 use matrix_sdk::ruma::events::{AnyMessageEventContent, SyncMessageEvent};
-use matrix_sdk::ruma::events::{RoomAccountDataEventContent, StrippedStateEvent};
 use matrix_sdk::{room::Room, Client};
 use matrix_sdk::{ClientConfig, SyncSettings};
 use reqwest::Url;
@@ -32,7 +32,7 @@ async fn on_room_message(event: SyncMessageEvent<MessageEventContent>, room: Roo
             return;
         };
         if msg_body.contains(".rom") {
-            let mut iter = msg_body.split(" ");
+            let mut iter = msg_body.split(' ');
             //Skip the next iter
             iter.next();
             let phone = iter.collect::<Vec<&str>>().join(" ");
@@ -43,17 +43,11 @@ async fn on_room_message(event: SyncMessageEvent<MessageEventContent>, room: Roo
             } else {
                 "Phone not found".to_owned()
             };
+            let content = AnyMessageEventContent::RoomMessage(MessageEventContent::new(
+                MessageType::Text(TextMessageEventContent::markdown(text)),
+            ));
 
-            let content =
-                AnyMessageEventContent::RoomMessage(MessageEventContent::text_plain(text));
-
-            println!("sending");
-
-            // send our message to the room we found the "!party" command in
-            // the last parameter is an optional Uuid which we don't care about.
             room.send(content, None).await.unwrap();
-
-            println!("message sent");
         }
     }
 }
@@ -72,9 +66,6 @@ async fn on_stripped_state_member(
         let mut delay = 2;
 
         while let Err(err) = room.accept_invitation().await {
-            // retry autojoin due to synapse sending invites, before the
-            // invited user can join for more information see
-            // https://github.com/matrix-org/synapse/issues/4345
             eprintln!(
                 "Failed to join room {} ({:?}), retrying in {}s",
                 room.room_id(),
@@ -112,6 +103,9 @@ pub async fn start_matrix() -> Result<()> {
         .await
         .unwrap();
 
+    // log::info!("Logged in as: {}",client.u);
+    log::info!("Logged in as: {}", "now rom");
+    log::info!("Logged in as: {}", "now rom");
     log::info!("Logged in as: {}", "now rom");
     client.register_event_handler(on_room_message).await;
     client
@@ -119,9 +113,6 @@ pub async fn start_matrix() -> Result<()> {
         .await;
     client.sync_once(SyncSettings::default()).await.unwrap();
 
-    // client.register_event_handler(events::AnyRoomEvent).await;
-
-    let settings = SyncSettings::default().token(client.sync_token().await.unwrap());
-    client.sync(settings).await;
+    client.sync(SyncSettings::default()).await;
     Ok(())
 }

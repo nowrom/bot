@@ -7,15 +7,11 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.52"
-arc-swap = "1.5.0"
 base64 = "0.13.0"
-byte-unit = "4.0.13"
-cached = "0.26.2"
 dotenv = "0.15.0"
 fuse-rust = "0.3.0"
 futures = "0.3.19"
 http = "0.2.6"
-humantime = "2.1.0"
 lazy_static = "1.4.0"
 log = "0.4.14"
 matrix-sdk = { version = "0.4.1", features = ["markdown"] }
@@ -24,17 +20,12 @@ openssl = { version = "0.10.38", optional = true }
 rand = "0.8.4"
 reqwest = { version = "0.11.9", features = ["json", "gzip", "brotli"] }
 serde = { version = "1.0.133", features = ["derive"] }
-serde_json = "1.0.74"
-# telexide-fork = "0.2.1"
-teloxide = { version = "0.5.3", features = ["macros", "auto-send"] }
+serde_json = "1.0.75"
+tbot = { git = "https://gitlab.com/Tricked/tbot", branch = "Tricked-master-patch-47419" }
 tokio = { version = "1.15.0", features = ["full"] }
-tokio-pg-mapper = "0.2.0"
-tokio-pg-mapper-derive = "0.2.0"
-tokio-postgres = "0.7.5"
 tracing = "0.1.29"
 tracing-subscriber = "0.3.6"
-twilight-embed-builder = "0.8.0"
-twilight-gateway = "0.8.3"
+twilight-gateway = "0.8.4"
 twilight-http = "0.8.4"
 twilight-model = "0.8.4"
 twilight-util = { version = "0.8.2", features = ["builder"] }

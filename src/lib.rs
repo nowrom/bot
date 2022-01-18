@@ -1,12 +1,13 @@
 pub mod discord;
 pub mod matrix;
+pub mod telegram;
 
 use std::{collections::HashSet, sync::Mutex};
 
 use fuse_rust::{Fuse, FuseProperty, Fuseable};
 use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
-// pub mod telegram;
+
 #[derive(Deserialize, Serialize, Debug, Clone, Hash, PartialEq, Eq)]
 pub struct RomDevice {
     id: String,
@@ -57,7 +58,7 @@ impl Fuseable for Device {
             },
             FuseProperty {
                 value: String::from("codename"),
-                weight: 2.0,
+                weight: 0.5,
             },
             FuseProperty {
                 value: String::from("brand"),
@@ -67,12 +68,12 @@ impl Fuseable for Device {
     }
 
     fn lookup(&self, key: &str) -> Option<&str> {
-        return match key {
+        match key {
             "name" => Some(&self.name),
             "codename" => Some(&self.codename),
             "brand" => Some(&self.brand),
             _ => None,
-        };
+        }
     }
 }
 
@@ -98,7 +99,7 @@ pub async fn update_devices() {
 }
 
 pub fn get_data() -> Vec<Device> {
-    (*&DATA.lock().unwrap()).to_vec()
+    (DATA.lock().unwrap()).to_vec()
 }
 
 pub fn search(text: String) -> Option<(Device, Vec<Device>)> {
@@ -111,11 +112,9 @@ pub fn search(text: String) -> Option<(Device, Vec<Device>)> {
     } else {
         let val = data[results[0].index].clone();
         let mut alternatives = vec![];
-        for index in 2..=10 {
-            if index > results.len() {
-                continue;
-            };
-            alternatives.push(data[results[index].index].clone());
+
+        for r in results.iter().take(10).collect::<Vec<_>>() {
+            alternatives.push(data[r.index].clone());
         }
         Some((val, alternatives))
     };
@@ -126,12 +125,12 @@ pub fn codename(i: String) -> Option<Device> {
     let mut iter = data.iter();
     let search = i.to_lowercase();
     let t = iter.find(|x| *x.codename().to_lowercase() == search);
-    t.map(|x| x.clone())
+    t.cloned()
 }
 
 pub fn format_device(d: Device, other: Vec<Device>) -> String {
     format!(
-        "{} {}\ncodename: `{}`\nroms: {}{}",
+        "{} {}  \ncodename: `{}`  \nroms: {}{}",
         d.brand,
         d.name,
         d.codename,
@@ -142,7 +141,7 @@ pub fn format_device(d: Device, other: Vec<Device>) -> String {
             .join(", "),
         if !other.is_empty() {
             format!(
-                "\nor did you mean: {}",
+                "  \nor did you mean: {}",
                 other
                     .iter()
                     .map(|x| { format!("`{}`", x.codename) })
@@ -150,7 +149,7 @@ pub fn format_device(d: Device, other: Vec<Device>) -> String {
                     .join(", ")
             )
         } else {
-            format!("")
+            String::new()
         }
     )
 }

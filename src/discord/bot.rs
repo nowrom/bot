@@ -7,9 +7,7 @@ use twilight_gateway::Cluster;
 use twilight_gateway::Event;
 use twilight_gateway::Intents;
 use twilight_http::Client;
-use twilight_model::application::callback::CallbackData;
 use twilight_model::application::interaction::Interaction;
-use twilight_model::channel::message::AllowedMentions;
 use twilight_model::id::ApplicationId;
 use twilight_model::id::GuildId;
 
@@ -56,7 +54,7 @@ pub async fn start_discord() -> Result<()> {
                         cmd.member.as_ref().unwrap().user.as_ref().unwrap().name
                     );
                     let r = commands::builtin_exec(&http, &cmd).await;
-                    if let Err(r) = r {}
+                    if let Err(_r) = r {}
                 }
                 _ => {}
             },
