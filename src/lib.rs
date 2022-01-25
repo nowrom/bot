@@ -99,9 +99,7 @@ pub async fn codename(i: String) -> Option<Device> {
 
 pub fn format_device(d: Device, other: Vec<Device>) -> String {
     format!(
-        "{} {}  \ncodename: `{}`  \nroms: {}{}",
-        d.brand,
-        d.name,
+        "https://rom.tricked.pro/device/{}{}",
         d.codename,
         d.roms
             .iter()
