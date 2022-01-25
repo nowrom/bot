@@ -99,19 +99,7 @@ pub async fn codename(i: String) -> Option<Device> {
 
 pub fn format_device(d: Device, other: Vec<Device>) -> String {
     format!(
-        "https://rom.tricked.pro/device/{}{}",
+        "https://rom.tricked.pro/device/{}",
         d.codename,
-        if !other.is_empty() {
-            format!(
-                "  \nor did you mean: {}",
-                other
-                    .iter()
-                    .map(|x| { format!("`{}`", x.codename) })
-                    .collect::<Vec<String>>()
-                    .join(", ")
-            )
-        } else {
-            String::new()
-        }
     )
 }
