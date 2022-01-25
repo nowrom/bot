@@ -101,11 +101,6 @@ pub fn format_device(d: Device, other: Vec<Device>) -> String {
     format!(
         "https://rom.tricked.pro/device/{}{}",
         d.codename,
-        d.roms
-            .iter()
-            .map(|x| { format!("`{}`", x.id) })
-            .collect::<Vec<String>>()
-            .join(", "),
         if !other.is_empty() {
             format!(
                 "  \nor did you mean: {}",
