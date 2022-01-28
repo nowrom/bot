@@ -21,10 +21,10 @@ pub fn command() -> Command {
         "Find the fucking rom".into(),
         CommandType::ChatInput,
     )
-    .option(StringBuilder::new(
-        "device".into(),
-        "Device you want to search roms for".into(),
-    ))
+    .option(
+        StringBuilder::new("device".into(), "Device you want to search roms for".into())
+            .autocomplete(true),
+    )
     .option(StringBuilder::new(
         "codename".into(),
         "Find a device by codename".into(),
@@ -48,16 +48,11 @@ pub async fn execute(client: &Client, cmd: &ApplicationCommand) -> Result<()> {
     let iter = cmd.data.options.iter();
     let device = get_arg(iter.clone(), "device");
     let code = get_arg(iter.clone(), "codename");
-    let m = if let Some(device) = device {
-        let device = search(device).await;
-        if let Some((device, alternatives)) = device {
-            format_device(device, alternatives)
-        } else {
-            "Phone not found".to_owned()
-        }
-    } else if let Some(cn) = code {
-        if let Some(device) = codename(cn).await {
-            format_device(device, vec![])
+    let cdn = device.map(|x| Some(x)).unwrap_or(code);
+    let m = if let Some(device) = cdn {
+        let device = codename(device).await;
+        if let Some(device) = device {
+            format_device(device, Vec::new())
         } else {
             "Phone not found".to_owned()
         }

@@ -7,14 +7,19 @@ use twilight_gateway::Cluster;
 use twilight_gateway::Event;
 use twilight_gateway::Intents;
 use twilight_http::Client;
+use twilight_model::application::callback::Autocomplete;
+use twilight_model::application::callback::InteractionResponse;
+use twilight_model::application::command::CommandOptionChoice;
 use twilight_model::application::interaction::Interaction;
 use twilight_model::id::ApplicationId;
 use twilight_model::id::GuildId;
 
 use crate::discord::commands;
 use crate::discord::prelude::*;
+use crate::search;
 
 use super::commands::rom;
+use super::commands::rom::get_arg;
 
 #[allow(clippy::single_match)]
 pub async fn start_discord() -> Result<()> {
@@ -57,8 +62,35 @@ pub async fn start_discord() -> Result<()> {
                     let r = commands::builtin_exec(&http, &cmd).await;
                     if let Err(_r) = r {}
                 }
+                Interaction::ApplicationCommandAutocomplete(cmd) => {
+                    let iter = cmd.data.options.iter();
+                    let device = get_arg(iter.clone(), "device");
+                    let r = search(device.unwrap()).await;
+                    http.interaction_callback(
+                        cmd.id,
+                        &cmd.token,
+                        &InteractionResponse::Autocomplete(Autocomplete {
+                            choices: r
+                                .map(|x| {
+                                    let mut devices = x.1;
+                                    devices
+                                        .into_iter()
+                                        .map(|x| CommandOptionChoice::String {
+                                            value: x.codename,
+                                            name: x.name,
+                                        })
+                                        .collect::<Vec<CommandOptionChoice>>()
+                                })
+                                .unwrap_or(Vec::new()),
+                        }),
+                    )
+                    .exec()
+                    .await
+                    .unwrap();
+                }
                 _ => {}
             },
+
             Event::Ready(_) => {
                 log::info!("Bot got on")
             }
